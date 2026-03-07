@@ -62,13 +62,122 @@
 }
 
 .about-preview {
-    padding: 8rem 2rem;
-    text-align: center;
+    padding: 8rem 0;
+    background-color: #FAFAFA;
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+}
+
+.about-text-content {
+    text-align: left;
 }
 
 .subtitle {
     color: var(--color-accent);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 3px;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+}
+
+.about-text-content h2 {
+    font-size: 2.2rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    color: var(--color-text);
+}
+
+.about-description {
+    font-size: 1.05rem;
+    color: #666;
+    line-height: 1.9;
+    font-weight: 300;
+}
+
+/* Contact Cards UI */
+.contact-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.contact-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+    padding: 2rem;
+    background: #FFFFFF;
+    border-radius: 16px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(155, 140, 122, 0.05);
+}
+
+.contact-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(155, 140, 122, 0.12);
+    border-color: rgba(155, 140, 122, 0.2);
+}
+
+.contact-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background-color: rgba(155, 140, 122, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+    transition: all 0.4s ease;
+}
+
+.contact-card:hover .contact-icon {
+    background-color: var(--color-accent);
+    color: #FFF;
+    transform: scale(1.05);
+}
+
+.contact-info h3 {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     font-weight: 600;
-    letter-spacing: 2px;
-    margin-bottom: 1rem;
+}
+
+.contact-info p {
+    font-size: 1.05rem;
+    color: var(--color-text);
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 3.5rem;
+        padding: 0 2rem;
+    }
+
+    .about-text-content {
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .contact-cards {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
 }
