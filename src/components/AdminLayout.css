@@ -1,0 +1,202 @@
+.admin-layout-container {
+    display: flex;
+    height: 100vh;
+    background-color: #f8f9fa;
+    /* Light gray background */
+    color: #1f2937;
+    /* Dark gray text */
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+}
+
+/* Sidebar Styles */
+.admin-sidebar {
+    width: 260px;
+    background-color: #ffffff;
+    /* White background */
+    border-right: 1px solid #e5e7eb;
+    /* Light gray border */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 20;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+}
+
+.admin-sidebar-header {
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    /* Light gray border */
+}
+
+.admin-sidebar-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #1f2937;
+    /* Dark text */
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.admin-sidebar-nav {
+    flex: 1;
+    padding: 1.25rem 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: #6b7280;
+    /* gray-500 */
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.admin-nav-item:hover {
+    color: #1f2937;
+    /* gray-800 */
+    background-color: #f3f4f6;
+    /* gray-100 */
+}
+
+.admin-nav-item.active {
+    color: #ffffff;
+    /* white */
+    background-color: #3b82f6;
+    /* blue-500 */
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.admin-nav-icon {
+    opacity: 0.8;
+}
+
+.admin-sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+    /* Light gray border */
+    background-color: #ffffff;
+    /* white */
+}
+
+.admin-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    color: #ef4444;
+    /* red-500 */
+    background: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-logout-btn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Main Content Area Styles */
+.admin-main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.admin-header {
+    height: 4rem;
+    background-color: #ffffff;
+    /* white */
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #e5e7eb;
+    /* Light gray border */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.admin-header-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    /* gray-800 */
+}
+
+.admin-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.admin-user-greeting {
+    font-size: 0.875rem;
+    color: #6b7280;
+    /* gray-500 */
+    font-weight: 500;
+}
+
+.admin-settings-btn {
+    padding: 0.5rem;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid #d1d5db;
+    /* Light gray border */
+    color: #6b7280;
+    /* gray-500 */
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-settings-btn:hover {
+    color: #1f2937;
+    /* gray-800 */
+    background-color: #f3f4f6;
+    /* gray-100 */
+    transform: rotate(30deg);
+}
+
+.admin-content-area {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    /* Light gray background */
+}
+
+/* Basic styling for inner cards/dashboard elements to match the theme */
+.admin-card {
+    background-color: #ffffff;
+    /* white */
+    border: 1px solid #e5e7eb;
+    /* gray-200 */
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
