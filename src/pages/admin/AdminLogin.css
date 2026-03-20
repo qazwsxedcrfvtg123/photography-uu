@@ -127,6 +127,7 @@
   background-color: rgba(37, 99, 235, 0.1);
   filter: blur(100px);
   pointer-events: none;
+  z-index: 1;
 }
 
 .glow-purple {
@@ -139,6 +140,7 @@
   background-color: rgba(79, 70, 229, 0.1);
   filter: blur(100px);
   pointer-events: none;
+  z-index: 1;
 }
 
 .admin-form-wrapper {
@@ -226,7 +228,9 @@
 }
 
 .admin-input-wrapper {
-  position: relative;
+    position: relative; /* 讓內部圖標可以絕對定位 */
+    display: flex;
+    align-items: center;
 }
 
 .admin-input-icon {

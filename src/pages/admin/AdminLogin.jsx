@@ -70,7 +70,7 @@ export default function AdminLogin() {
         }
 
         // Hardcoded credentials for Demo/Portfolio purpose
-        if (username === 'admin' && password === 'admin123') {
+        if (username === 'admin' && password === '123456') {
             localStorage.setItem('adminToken', 'authenticated');
             navigate('/admin');
         } else {
@@ -135,19 +135,19 @@ export default function AdminLogin() {
                     {/* Form */}
                     <form onSubmit={handleLogin} className="admin-form">
 
-                        {/* Username Input */}
-                        <div className="admin-input-group">
+
+                          <div className="admin-input-group">
                             <label className="admin-input-label">使用者帳號</label>
                             <div className="admin-input-wrapper">
                                 <div className="admin-input-icon">
-                                    <Lock size={20} />
+                                    <User size={20} />
                                 </div>
                                 <input
-                                    type="text"
+                                    type="password"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     className="admin-input"
-                                    placeholder="輸入管理員帳號"
+                                    placeholder="請輸入管理員帳號"
                                     required
                                 />
                             </div>
