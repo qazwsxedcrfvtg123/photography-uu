@@ -15,7 +15,7 @@ export default function Navbar() {
     return (
         <nav className="navbar">
             <div className="container nav-content">
-                <Link to="/" className="nav-logo">Photography</Link>
+                <Link to="/" className="nav-logo">BeU Photography</Link>
                 <div className="nav-links">
                     <Link to="/family">溫馨家庭寫真</Link>
                     <Link to="/professional">專業形象攝影</Link>

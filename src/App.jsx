@@ -4,6 +4,7 @@ import AdminLayout from './components/AdminLayout';
 import Home from './pages/Home';
 import Family from './pages/Family';
 import Professional from './pages/Professional';
+import Baby from './pages/Baby';
 import About from './pages/About';
 import Booking from './pages/Booking';
 import AdminLogin from './pages/admin/AdminLogin';
@@ -17,6 +18,7 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/family" element={<Family />} />
+          <Route path="/baby" element={<Baby />} />
           <Route path="/professional" element={<Professional />} />
           <Route path="/about" element={<About />} />
           <Route path="/booking" element={<Booking />} />

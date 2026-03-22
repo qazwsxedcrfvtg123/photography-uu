@@ -8,14 +8,21 @@ export default function Home() {
                 <div className="hero-half hero-family">
                     <div className="hero-content">
                         <h1>凝結純粹的溫度</h1>
-                        <p>紀錄寶寶與家人的每個溫馨瞬間</p>
+                        <p>紀錄家人相處的溫馨瞬間</p>
                         <Link to="/family" className="btn">探索家庭寫真</Link>
+                    </div>
+                </div>
+                <div className="hero-half hero-baby">
+                    <div className="hero-content">
+                        <h1>萌動初生的喜悅</h1>
+                        <p>捕捉新生兒最柔軟的時光</p>
+                        <Link to="/baby" className="btn" style={{ backgroundColor: '#EADBC8', color: '#5C5247' }}>探索新生兒攝影</Link>
                     </div>
                 </div>
                 <div className="hero-half hero-professional">
                     <div className="hero-content">
                         <h1>刻劃淬鍊的專業</h1>
-                        <p>打造極具氣場的高階主管與團隊形象</p>
+                        <p>打造極具氣場的高階形象</p>
                         <Link to="/professional" className="btn" style={{ backgroundColor: '#2A2A2A' }}>打造專業形象</Link>
                     </div>
                 </div>
