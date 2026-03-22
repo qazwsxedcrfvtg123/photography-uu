@@ -5,4 +5,13 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/photography-uu/',
+  server: {
+    proxy: {
+      '/photography-uu/api': {
+        target: 'http://127.0.0.1:8888',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/photography-uu\/api/, '/api')
+      }
+    }
+  }
 })

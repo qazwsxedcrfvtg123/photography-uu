@@ -23,33 +23,31 @@ export default function AdminLayout() {
             <aside className="admin-sidebar">
                 <div className="admin-sidebar-header">
                     <h1 className="admin-sidebar-title">
-                        <Camera size={24} color="#a1a1aa" />
-                        攝影後台系統
+                        <strong>攝影</strong>後台系統
                     </h1>
                 </div>
 
                 <nav className="admin-sidebar-nav">
                     <a href="/admin" className="admin-nav-item active">
-                        <LayoutDashboard size={18} className="admin-nav-icon" />
+                        <LayoutDashboard size={18} />
                         <span>首頁總覽</span>
                     </a>
-                    {/* Add more links here later */}
                 </nav>
 
                 <div className="admin-sidebar-footer">
                     <button onClick={handleLogout} className="admin-logout-btn">
-                        <LogOut size={18} className="admin-nav-icon" />
+                        <LogOut size={18} />
                         <span>登出系統</span>
                     </button>
                 </div>
-            </aside>
+            </aside >
 
             {/* Main Content */}
-            <main className="admin-main-content">
+            < main className="admin-main-content" >
                 <header className="admin-header">
-                    <h2 className="admin-header-title">管理介面</h2>
+                    <h2 className="admin-header-title">管理首頁 / Dashboard</h2>
                     <div className="admin-header-actions">
-                        <span className="admin-user-greeting">管理者，您好</span>
+                        <span className="admin-user-greeting">Welcome, Administrator</span>
                         <button className="admin-settings-btn" title="系統設定">
                             <Settings size={18} />
                         </button>
@@ -59,7 +57,7 @@ export default function AdminLayout() {
                 <div className="admin-content-area">
                     <Outlet />
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 }

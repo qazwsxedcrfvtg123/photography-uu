@@ -13,3 +13,7 @@ React Compiler (React 編譯器)
 
 擴展 ESLint 設定
 如果你正在開發一個準備要上線 (Production) 的應用程式，我們建議你使用 TypeScript，並開啟具備型別感知的 lint 規則。請參考 TS 模板，了解如何在這個專案中整合 TypeScript 與 typescript-eslint。
+
+
+启动nginx
+C:\nginx\nginx.exe -c C:\uugitpage\photography-uu\nginx.conf
