@@ -17,9 +17,18 @@ export default function Dashboard() {
             return;
         }
 
+        const typeMap = {
+            'family': 1,
+            'baby': 2,
+            'professional': 3,
+            'wedding': 4,
+            'common': 5
+        };
+
         const formData = new FormData();
         formData.append('file', uploadFile);
         formData.append('category', category);
+        formData.append('type', typeMap[category] || 5);
 
         try {
             setIsUploading(true);
@@ -32,7 +41,7 @@ export default function Dashboard() {
 
             if (!response.ok) throw new Error(`上傳失敗 ${response.status}`);
             const result = await response.json();
-            setUploadMessage(`上傳成功：${result.url}`);
+            setUploadMessage(`上傳成功：${result.fileUrl}`);
 
             setRecentUploads((prev) => [
                 { id: Date.now(), fileName: uploadFile.name, category, status: '完成', url: result.url || '-', time: new Date().toLocaleString() },

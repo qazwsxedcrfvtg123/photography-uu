@@ -1,20 +1,38 @@
-import { Outlet, Navigate, useNavigate } from 'react-router-dom';
-import { LogOut, LayoutDashboard, Settings, Camera } from 'lucide-react';
+import { Outlet, Navigate, useNavigate, NavLink } from 'react-router-dom';
+import { LogOut, LayoutDashboard, Settings, Camera, Image as ImageIcon } from 'lucide-react';
 
 import './AdminLayout.css';
 
 export default function AdminLayout() {
     const navigate = useNavigate();
-    // Simple check for token in localStorage
-    const isAuthenticated = localStorage.getItem('adminToken') === 'authenticated';
+    // Check if token exists in localStorage
+    const adminToken = localStorage.getItem('adminToken');
+    const isAuthenticated = adminToken !== null && adminToken !== '';
 
     if (!isAuthenticated) {
         return <Navigate to="/admin/login" replace />;
     }
 
-    const handleLogout = () => {
-        localStorage.removeItem('adminToken');
-        navigate('/admin/login');
+    const handleLogout = async () => {
+        try {
+            const token = localStorage.getItem('adminToken');
+
+            // 呼叫後端登出接口，並帶上 Token
+            await fetch(import.meta.env.BASE_URL + 'api/auth/logout', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        } catch (err) {
+            console.error('Logout error:', err);
+        } finally {
+            // 無論後端成功與否，前端都清除狀態並導回登入頁
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUsername');
+            localStorage.removeItem('adminRole');
+            navigate('/admin/login');
+        }
     };
 
     return (
@@ -28,10 +46,14 @@ export default function AdminLayout() {
                 </div>
 
                 <nav className="admin-sidebar-nav">
-                    <a href="/admin" className="admin-nav-item active">
+                    <NavLink to="/admin" end className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}>
                         <LayoutDashboard size={18} />
                         <span>首頁總覽</span>
-                    </a>
+                    </NavLink>
+                    <NavLink to="/admin/photos" className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}>
+                        <ImageIcon size={18} />
+                        <span>圖片處理</span>
+                    </NavLink>
                 </nav>
 
                 <div className="admin-sidebar-footer">
@@ -47,7 +69,9 @@ export default function AdminLayout() {
                 <header className="admin-header">
                     <h2 className="admin-header-title">管理首頁 / Dashboard</h2>
                     <div className="admin-header-actions">
-                        <span className="admin-user-greeting">Welcome, Administrator</span>
+                        <span className="admin-user-greeting">
+                            Welcome, {localStorage.getItem('adminUsername') || 'Administrator'}
+                        </span>
                         <button className="admin-settings-btn" title="系統設定">
                             <Settings size={18} />
                         </button>

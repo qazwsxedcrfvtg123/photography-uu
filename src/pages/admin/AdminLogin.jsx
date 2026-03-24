@@ -58,7 +58,7 @@ export default function AdminLogin() {
         generateCaptcha();
     }, []);
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
 
@@ -69,12 +69,36 @@ export default function AdminLogin() {
             return;
         }
 
-        // Hardcoded credentials for Demo/Portfolio purpose
-        if (username === 'admin' && password === '123456') {
-            localStorage.setItem('adminToken', 'authenticated');
-            navigate('/admin');
-        } else {
-            setError('帳號或密碼錯誤');
+        try {
+            // 加上 base path 讓代理能正確捕捉並轉發
+            const response = await fetch(import.meta.env.BASE_URL + 'api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                // 儲存真正的 JWT Token
+                localStorage.setItem('adminToken', data.token || 'authenticated');
+
+                // 順便把用戶名稱與權限也存起來，方便後台取用顯示
+                if (data.username) localStorage.setItem('adminUsername', data.username);
+                if (data.role) localStorage.setItem('adminRole', data.role);
+
+                navigate('/admin');
+            } else {
+                setError('帳號或密碼錯誤');
+                generateCaptcha();
+                setCaptchaInput('');
+                setPassword('');
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            setError('系統發生錯誤，請稍後再試');
             generateCaptcha();
             setCaptchaInput('');
         }
@@ -136,7 +160,7 @@ export default function AdminLogin() {
                     <form onSubmit={handleLogin} className="admin-form">
 
 
-                          <div className="admin-input-group">
+                        <div className="admin-input-group">
                             <label className="admin-input-label">使用者帳號</label>
                             <div className="admin-input-wrapper">
                                 <div className="admin-input-icon">

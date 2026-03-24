@@ -8,8 +8,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/photography-uu/api': {
-        target: 'http://127.0.0.1:80',
-        changeOrigin: true
+        target: 'http://127.0.0.1:8888',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/photography-uu\/api/, '/api')
       }
     }
   }

@@ -9,6 +9,7 @@ import About from './pages/About';
 import Booking from './pages/Booking';
 import AdminLogin from './pages/admin/AdminLogin';
 import Dashboard from './pages/admin/Dashboard';
+import PhotoManagement from './pages/admin/PhotoManagement';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         {/* Admin Dashboard Routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
+          <Route path="photos" element={<PhotoManagement />} />
           {/* Add more admin pages here */}
         </Route>
       </Routes>
