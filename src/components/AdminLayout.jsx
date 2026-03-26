@@ -1,13 +1,14 @@
 import { Outlet, Navigate, useNavigate, NavLink } from 'react-router-dom';
 import { LogOut, LayoutDashboard, Settings, Camera, Image as ImageIcon } from 'lucide-react';
+import { api } from '../utils/api';
 
 import './AdminLayout.css';
 
 export default function AdminLayout() {
     const navigate = useNavigate();
-    // Check if token exists in localStorage
-    const adminToken = localStorage.getItem('adminToken');
-    const isAuthenticated = adminToken !== null && adminToken !== '';
+    // Check if token exists in localStorage (using the new name)
+    const accessToken = localStorage.getItem('accessToken');
+    const isAuthenticated = accessToken !== null && accessToken !== '';
 
     if (!isAuthenticated) {
         return <Navigate to="/admin/login" replace />;
@@ -15,22 +16,13 @@ export default function AdminLayout() {
 
     const handleLogout = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
-
-            // 呼叫後端登出接口，並帶上 Token
-            await fetch(import.meta.env.BASE_URL + 'api/auth/logout', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            // 呼叫後端登出接口 (api 工具會自動帶上 accessToken)
+            await api.get('api/auth/logout');
         } catch (err) {
             console.error('Logout error:', err);
         } finally {
             // 無論後端成功與否，前端都清除狀態並導回登入頁
-            localStorage.removeItem('adminToken');
-            localStorage.removeItem('adminUsername');
-            localStorage.removeItem('adminRole');
+            localStorage.clear();
             navigate('/admin/login');
         }
     };

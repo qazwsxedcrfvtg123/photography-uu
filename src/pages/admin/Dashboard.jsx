@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Camera, Image, Users, Calendar, UploadCloud } from 'lucide-react';
+import { api } from '../../utils/api';
 
 export default function Dashboard() {
     const [uploadFile, setUploadFile] = useState(null);
@@ -34,13 +35,7 @@ export default function Dashboard() {
             setIsUploading(true);
             setUploadMessage('上傳中...');
 
-            const response = await fetch('/photography-uu/api/uploadFiles', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) throw new Error(`上傳失敗 ${response.status}`);
-            const result = await response.json();
+            const result = await api.post('api/uploadFiles', formData);
             setUploadMessage(`上傳成功：${result.fileUrl}`);
 
             setRecentUploads((prev) => [

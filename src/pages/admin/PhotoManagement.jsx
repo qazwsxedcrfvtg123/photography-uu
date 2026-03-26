@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Image as ImageIcon, Trash2, Filter, Loader2 } from 'lucide-react';
+import { api } from '../../utils/api';
 
 export default function PhotoManagement() {
     const [photos, setPhotos] = useState([]);
@@ -21,9 +22,7 @@ export default function PhotoManagement() {
     const fetchPhotos = async () => {
         try {
             setLoading(true);
-            const response = await fetch(import.meta.env.BASE_URL + 'api/photos/all');
-            if (!response.ok) throw new Error('無法獲取圖片列表');
-            const data = await response.json();
+            const data = await api.get('api/photos/all');
             setPhotos(data);
         } catch (err) {
             console.error(err);
@@ -33,23 +32,18 @@ export default function PhotoManagement() {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm('確定要刪除這張圖片嗎？')) return;
+    const handleDelete = async (photo) => {
+        if (!window.confirm(`確定要刪除圖片「${photo.fileName}」嗎？`)) return;
         try {
-            const response = await fetch(import.meta.env.BASE_URL + `api/photos/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                }
+            // 根據後端提供的 @PostMapping("/deleteFiles") 與 @RequestParam("fileName")
+            await api.post('api/photos/deleteFiles', null, {
+                params: { fileName: photo.fileName }
             });
-            if (response.ok) {
-                setPhotos(photos.filter(p => p.id !== id));
-            } else {
-                alert('刪除失敗');
-            }
+            // 刪除成功後重新抓取清單，確保佈局與資料完全同步
+            await fetchPhotos();
         } catch (err) {
             console.error(err);
-            alert('系統錯誤');
+            alert('刪除失敗');
         }
     };
 
@@ -114,37 +108,35 @@ export default function PhotoManagement() {
                                     <p className="text-sm text-gray-400">目前尚無此分類的圖片</p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                                <div className="photo-grid">
                                     {categoryPhotos.map((photo) => (
-                                        <div key={photo.id} className="group relative bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
-                                            <div className="aspect-square w-full overflow-hidden bg-gray-100">
+                                        <div key={photo.id} className="photo-grid-item">
+                                            <div className="image-wrapper">
                                                 <img
                                                     src={photo.fileUrl || photo.url}
                                                     alt={photo.fileName}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                 />
+                                                {/* Overlay Actions */}
+                                                <div className="overlay">
+                                                    <button
+                                                        onClick={() => window.open(photo.fileUrl || photo.url, '_blank')}
+                                                        className="view-btn"
+                                                        title="查看大圖"
+                                                    >
+                                                        <ImageIcon size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(photo)}
+                                                        className="delete-btn"
+                                                        title="刪除"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
                                             </div>
 
-                                            {/* Overlay Actions */}
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                                <button
-                                                    onClick={() => window.open(photo.fileUrl || photo.url, '_blank')}
-                                                    className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white backdrop-blur-sm transition-colors"
-                                                    title="查看大圖"
-                                                >
-                                                    <ImageIcon size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(photo.id)}
-                                                    className="p-2 bg-red-500/80 hover:bg-red-500 rounded-full text-white backdrop-blur-sm transition-colors"
-                                                    title="刪除"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-
-                                            <div className="p-2">
-                                                <p className="text-[10px] text-gray-400 truncate text-center" title={photo.fileName}>
+                                            <div className="photo-info">
+                                                <p className="photo-name" title={photo.fileName}>
                                                     {photo.fileName}
                                                 </p>
                                             </div>

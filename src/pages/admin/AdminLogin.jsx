@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User, Shield, Camera } from 'lucide-react';
+import { api } from '../../utils/api';
 
 import './AdminLogin.css';
 
@@ -70,37 +71,28 @@ export default function AdminLogin() {
         }
 
         try {
-            // 加上 base path 讓代理能正確捕捉並轉發
-            const response = await fetch(import.meta.env.BASE_URL + 'api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            });
+            const data = await api.post('api/auth/login', { username, password });
 
-            if (response.ok) {
-                const data = await response.json();
-
-                // 儲存真正的 JWT Token
-                localStorage.setItem('adminToken', data.token || 'authenticated');
-
-                // 順便把用戶名稱與權限也存起來，方便後台取用顯示
-                if (data.username) localStorage.setItem('adminUsername', data.username);
-                if (data.role) localStorage.setItem('adminRole', data.role);
-
-                navigate('/admin');
-            } else {
-                setError('帳號或密碼錯誤');
-                generateCaptcha();
-                setCaptchaInput('');
-                setPassword('');
+            // 儲存 JWT Tokens
+            localStorage.setItem('accessToken', data.accessToken || data.token);
+            if (data.refreshToken) {
+                localStorage.setItem('refreshToken', data.refreshToken);
             }
+
+            console.log('Login Success, data:', data);
+
+            // 順便把用戶名稱與權限也存起來，方便後台取用顯示
+            if (data.username) localStorage.setItem('adminUsername', data.username);
+            if (data.role) localStorage.setItem('adminRole', data.role);
+
+            console.log('Navigating to /admin...');
+            navigate('/admin');
         } catch (err) {
             console.error('Login error:', err);
-            setError('系統發生錯誤，請稍後再試');
+            setError(err.message === '請求失敗 (401)' ? '帳號或密碼錯誤' : '帳號或密碼錯誤'); // Simplified for now since we want immediate answer
             generateCaptcha();
             setCaptchaInput('');
+            setPassword('');
         }
     };
 
@@ -168,6 +160,9 @@ export default function AdminLogin() {
                                 </div>
                                 <input
                                     type="password"
+                                    name="username"
+                                    id="username"
+                                    autoComplete="username"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     className="admin-input"
@@ -186,6 +181,9 @@ export default function AdminLogin() {
                                 </div>
                                 <input
                                     type="password"
+                                    name="password"
+                                    id="password"
+                                    autoComplete="current-password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="admin-input"

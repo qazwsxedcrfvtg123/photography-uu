@@ -350,3 +350,106 @@ body {
         width: 250px;
     }
 }
+
+/* Photo Management Grid Utilities & Components */
+.photo-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, 110px);
+    justify-content: flex-start;
+}
+
+.photo-grid-item {
+    position: relative;
+    width: 110px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #f1f1f1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.photo-grid-item:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.photo-grid-item .image-wrapper {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    overflow: hidden;
+    background-color: #f3f4f6;
+    position: relative;
+}
+
+.photo-grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.photo-grid-item:hover img {
+    transform: scale(1.1);
+}
+
+.photo-grid-item .overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.photo-grid-item:hover .overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.photo-grid-item .photo-info {
+    padding: 0.5rem;
+}
+
+.photo-grid-item .photo-name {
+    font-size: 10px;
+    color: #9ca3af;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.photo-grid-item .overlay button {
+    padding: 0.5rem;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.2s;
+    backdrop-filter: blur(4px);
+}
+
+.photo-grid-item .overlay .view-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.photo-grid-item .overlay .view-btn:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.photo-grid-item .overlay .delete-btn {
+    background-color: rgba(220, 53, 69, 0.8);
+}
+
+.photo-grid-item .overlay .delete-btn:hover {
+    background-color: #dc3545;
+}
