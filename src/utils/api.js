@@ -118,6 +118,18 @@ export const request = {
     delete: (url, config) => api.delete(url, config),
 };
 
+// 認證與管理員相關 API
+export const authApi = {
+    login: (credentials) => api.post('api/auth/login', credentials),
+    logout: () => api.get('api/auth/logout'),
+    changePassword: ({ oldPassword, newPassword }) =>
+        api.post('api/auth/change-password', { oldPassword, newPassword }),
+    addAdmin: ({ username, password, email, role = 'ADMIN' }) =>
+        api.post('api/auth/register', { username, password, email, role }),
+    forgotPassword: ({ email, username }) =>
+        api.post('api/auth/forgot-password', { email, username }),
+};
+
 // 同時提供具名導出與默認導出
 export { api };
 export default api;
