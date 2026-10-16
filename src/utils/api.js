@@ -126,8 +126,12 @@ export const authApi = {
         api.post('api/auth/change-password', { oldPassword, newPassword }),
     addAdmin: ({ username, password, email, role = 'ADMIN' }) =>
         api.post('api/auth/register', { username, password, email, role }),
-    forgotPassword: ({ email, username }) =>
-        api.post('api/auth/forgot-password', { email, username }),
+    forgotPassword: ({ email }) =>
+        api.post('api/auth/forgot-password', { email }),
+    verifyCode: ({ email, code }) =>
+        api.post('api/auth/verify-code', { email, code }),
+    resetPassword: ({ email, code, newPassword }) =>
+        api.post('api/auth/reset-password', { email, code, newPassword }),
 };
 
 // 同時提供具名導出與默認導出

@@ -371,8 +371,8 @@ function AddAdminModal({ onClose }) {
                                 value={role}
                                 onChange={(e) => setRole(e.target.value)}
                             >
-                                <option value="ADMIN">一般管理員 (ADMIN)</option>
-                                <option value="SUPER_ADMIN">超級管理員 (SUPER_ADMIN)</option>
+                                <option value="ROLE_ADMIN">管理員</option>
+                                <option value="ROLE_USER">用户</option>
                             </select>
                         </div>
                     </div>

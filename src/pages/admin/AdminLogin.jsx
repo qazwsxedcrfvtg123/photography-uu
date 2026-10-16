@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, User, Shield, Camera, Mail, X, CheckCircle2, AlertCircle, HelpCircle } from 'lucide-react';
+import { Lock, User, Shield, Camera, Mail, X, CheckCircle2, AlertCircle, HelpCircle, KeyRound, ArrowLeft } from 'lucide-react';
 import { api, authApi } from '../../utils/api';
 
 import './AdminLogin.css';
@@ -246,36 +246,111 @@ export default function AdminLogin() {
     );
 }
 
-// ----------------- 忘記密碼彈窗 -----------------
+// ----------------- 忘記密碼彈窗（三部曲：送驗證碼 -> 驗證碼校驗 -> 重設密碼） -----------------
 function ForgotPasswordModal({ onClose }) {
-    const [identifier, setIdentifier] = useState('');
+    const [step, setStep] = useState(1); // 1: 寄送驗證碼, 2: 驗證碼校驗, 3: 輸入新密碼, 4: 完成
+    const [email, setEmail] = useState('');
+    const [code, setCode] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [countdown, setCountdown] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const handleForgotSubmit = async (e) => {
-        e.preventDefault();
+    // 倒數計時器
+    useEffect(() => {
+        if (countdown <= 0) return;
+        const timer = setInterval(() => {
+            setCountdown((prev) => prev - 1);
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [countdown]);
+
+    const parseError = (err, fallback) => {
+        const data = err.response?.data;
+        if (typeof data === 'string' && data.trim()) return data;
+        return data?.message || err.message || fallback;
+    };
+
+    // 1. 發送重設驗證碼
+    const handleSendCode = async (e) => {
+        if (e) e.preventDefault();
         setError('');
         setSuccess('');
 
-        if (!identifier.trim()) {
-            setError('請輸入註冊的帳號或電子信箱');
+        const cleanEmail = email.trim();
+        if (!cleanEmail || !cleanEmail.includes('@')) {
+            setError('請輸入有效的電子信箱');
             return;
         }
 
         setLoading(true);
         try {
-            // 打後端忘記密碼 API
-            const isEmail = identifier.includes('@');
-            await authApi.forgotPassword({
-                email: isEmail ? identifier.trim() : undefined,
-                username: !isEmail ? identifier.trim() : undefined,
-            });
-
-            setSuccess('密碼重設指引已寄送！請前往您的信箱查看確認信。');
+            const res = await authApi.forgotPassword({ email: cleanEmail });
+            setSuccess(res?.message || '若該信箱已註冊，我們將寄送重設密碼的驗證碼');
+            setStep(2);
+            setCountdown(60);
         } catch (err) {
-            console.error('Forgot password error:', err);
-            setError(err.response?.data?.message || err.message || '發送失敗，請確認該帳號或信箱是否存在');
+            console.error('Send reset code error:', err);
+            setError(parseError(err, '發送失敗，請稍後再試'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 2. 驗證驗證碼
+    const handleVerifyCode = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+
+        const cleanCode = code.trim();
+        if (!cleanCode) {
+            setError('請輸入信件中的驗證碼');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await authApi.verifyCode({ email: email.trim(), code: cleanCode });
+            setSuccess(res?.message || '驗證成功，請設定新密碼');
+            setStep(3);
+        } catch (err) {
+            console.error('Verify code error:', err);
+            setError(parseError(err, '驗證碼錯誤或已過期'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 3. 重設密碼
+    const handleResetPassword = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+
+        if (newPassword.length < 6) {
+            setError('新密碼長度至少需 6 個字元');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            setError('兩次輸入的新密碼不一致');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await authApi.resetPassword({
+                email: email.trim(),
+                code: code.trim(),
+                newPassword,
+            });
+            setSuccess(res?.message || '密碼已重設，請使用新密碼登入');
+            setStep(4);
+        } catch (err) {
+            console.error('Reset password error:', err);
+            setError(parseError(err, '重設失敗，請確認驗證碼是否正確'));
         } finally {
             setLoading(false);
         }
@@ -287,18 +362,21 @@ function ForgotPasswordModal({ onClose }) {
                 <div className="admin-login-modal-header">
                     <div className="admin-login-modal-title">
                         <HelpCircle size={20} color="#60a5fa" />
-                        <h3>重設密碼</h3>
+                        <h3>
+                            重設密碼
+                            {step <= 3 && (
+                                <span className="admin-modal-step-tag">
+                                    步驟 {step}/3
+                                </span>
+                            )}
+                        </h3>
                     </div>
                     <button className="admin-login-modal-close" onClick={onClose}>
                         <X size={18} />
                     </button>
                 </div>
 
-                <form onSubmit={handleForgotSubmit} className="admin-login-modal-body">
-                    <p className="admin-login-modal-desc">
-                        請輸入您的管理員帳號或註冊 Email，系統將向您的信箱發送重設密碼的驗證連結。
-                    </p>
-
+                <div className="admin-login-modal-body">
                     {error && (
                         <div className="admin-login-modal-alert danger">
                             <AlertCircle size={16} />
@@ -313,44 +391,192 @@ function ForgotPasswordModal({ onClose }) {
                         </div>
                     )}
 
-                    {!success && (
-                        <div className="admin-input-group">
-                            <label className="admin-input-label">帳號或電子信箱</label>
-                            <div className="admin-input-wrapper">
-                                <div className="admin-input-icon">
-                                    <Mail size={18} />
+                    {/* 步驟 1：輸入 Email 寄送驗證碼 */}
+                    {step === 1 && (
+                        <form onSubmit={handleSendCode} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                            <p className="admin-login-modal-desc">
+                                請輸入您註冊的電子信箱，系統將發送一組安全驗證碼至該信箱。
+                            </p>
+                            <div className="admin-input-group">
+                                <label className="admin-input-label">電子信箱</label>
+                                <div className="admin-input-wrapper">
+                                    <div className="admin-input-icon">
+                                        <Mail size={18} />
+                                    </div>
+                                    <input
+                                        type="email"
+                                        className="admin-input"
+                                        placeholder="admin@example.com"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                        autoFocus
+                                    />
                                 </div>
-                                <input
-                                    type="text"
-                                    className="admin-input"
-                                    placeholder="admin 或 admin@example.com"
-                                    value={identifier}
-                                    onChange={(e) => setIdentifier(e.target.value)}
-                                    required
-                                />
+                            </div>
+
+                            <div className="admin-login-modal-footer">
+                                <button
+                                    type="button"
+                                    className="admin-modal-btn-cancel"
+                                    onClick={onClose}
+                                >
+                                    取消
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="admin-modal-btn-submit"
+                                    disabled={loading || !email.trim()}
+                                >
+                                    {loading ? '發送中...' : '發送驗證碼'}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {/* 步驟 2：輸入收到的驗證碼 */}
+                    {step === 2 && (
+                        <form onSubmit={handleVerifyCode} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                            <p className="admin-login-modal-desc">
+                                驗證碼已寄送至 <strong style={{ color: '#60a5fa' }}>{email}</strong>，請在下方輸入驗證碼。
+                            </p>
+                            <div className="admin-input-group">
+                                <label className="admin-input-label">驗證碼 (Verification Code)</label>
+                                <div className="admin-input-wrapper">
+                                    <div className="admin-input-icon">
+                                        <KeyRound size={18} />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        className="admin-input"
+                                        placeholder="請輸入 6 位驗證碼"
+                                        value={code}
+                                        onChange={(e) => setCode(e.target.value)}
+                                        required
+                                        autoFocus
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="admin-resend-row">
+                                <span>沒收到驗證碼？</span>
+                                <button
+                                    type="button"
+                                    className="admin-resend-btn"
+                                    disabled={countdown > 0 || loading}
+                                    onClick={() => handleSendCode()}
+                                >
+                                    {countdown > 0 ? `重新發送 (${countdown}s)` : '重新發送驗證碼'}
+                                </button>
+                            </div>
+
+                            <div className="admin-login-modal-footer">
+                                <button
+                                    type="button"
+                                    className="admin-modal-btn-cancel"
+                                    onClick={() => {
+                                        setError('');
+                                        setSuccess('');
+                                        setStep(1);
+                                    }}
+                                >
+                                    <ArrowLeft size={14} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
+                                    更換信箱
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="admin-modal-btn-submit"
+                                    disabled={loading || !code.trim()}
+                                >
+                                    {loading ? '驗證中...' : '下一步：重設密碼'}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {/* 步驟 3：輸入新密碼 */}
+                    {step === 3 && (
+                        <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                            <p className="admin-login-modal-desc">
+                                驗證通過！請輸入您欲設定的新密碼。
+                            </p>
+                            <div className="admin-input-group">
+                                <label className="admin-input-label">新密碼</label>
+                                <div className="admin-input-wrapper">
+                                    <div className="admin-input-icon">
+                                        <Lock size={18} />
+                                    </div>
+                                    <input
+                                        type="password"
+                                        className="admin-input"
+                                        placeholder="至少 6 位字元"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        required
+                                        autoFocus
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="admin-input-group">
+                                <label className="admin-input-label">確認新密碼</label>
+                                <div className="admin-input-wrapper">
+                                    <div className="admin-input-icon">
+                                        <Lock size={18} />
+                                    </div>
+                                    <input
+                                        type="password"
+                                        className="admin-input"
+                                        placeholder="請再次輸入新密碼"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="admin-login-modal-footer">
+                                <button
+                                    type="button"
+                                    className="admin-modal-btn-cancel"
+                                    onClick={() => {
+                                        setError('');
+                                        setSuccess('');
+                                        setStep(2);
+                                    }}
+                                >
+                                    上一步
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="admin-modal-btn-submit"
+                                    disabled={loading || !newPassword || !confirmPassword}
+                                >
+                                    {loading ? '重設中...' : '確認變更密碼'}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {/* 步驟 4：完成 */}
+                    {step === 4 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', textAlign: 'center', padding: '1rem 0' }}>
+                            <p className="admin-login-modal-desc">
+                                密碼重設已順利完成！請使用新密碼重新登入後台系統。
+                            </p>
+                            <div className="admin-login-modal-footer" style={{ justifyContent: 'center' }}>
+                                <button
+                                    type="button"
+                                    className="admin-modal-btn-submit"
+                                    onClick={onClose}
+                                    style={{ width: '100%' }}
+                                >
+                                    前往登入
+                                </button>
                             </div>
                         </div>
                     )}
-
-                    <div className="admin-login-modal-footer">
-                        <button
-                            type="button"
-                            className="admin-modal-btn-cancel"
-                            onClick={onClose}
-                        >
-                            關閉
-                        </button>
-                        {!success && (
-                            <button
-                                type="submit"
-                                className="admin-modal-btn-submit"
-                                disabled={loading}
-                            >
-                                {loading ? '傳送中...' : '寄送重設信'}
-                            </button>
-                        )}
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     );
